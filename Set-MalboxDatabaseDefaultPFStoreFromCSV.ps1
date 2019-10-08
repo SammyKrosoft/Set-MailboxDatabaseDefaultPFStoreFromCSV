@@ -38,7 +38,7 @@ None
 #>
 [CmdLetBinding(DefaultParameterSetName = "NormalRun")]
 Param(
-    [Parameter(Mandatory = $False, Position = 1, ParameterSetName = "NormalRun")][int]$InputCSV = ".\MAilboxDatabases-DefaultPublicStore.csv",
+    [Parameter(Mandatory = $False, Position = 1, ParameterSetName = "NormalRun")][string]$InputCSV = ".\MAilboxDatabases-DefaultPublicStore.csv",
     [Parameter(Mandatory = $False, Position = 2, ParameterSetName = "NormalRun")][switch]$TestOnly,
     [Parameter(Mandatory = $false, Position = 3, ParameterSetName = "CheckOnly")][switch]$CheckVersion
 )
@@ -70,6 +70,10 @@ $ScriptLog = "$ScriptPath\$($ScriptName)-$(Get-Date -Format 'dd-MMMM-yyyy-hh-mm-
 
 <# /DECLARATIONS #>
 <# -------------------------- FUNCTIONS -------------------------- #>
+Function HereStringToArray ($HereString) {
+    Return $HereString -split "`n" | %{$_.trim()}
+}
+
 Function Test-ExchTools(){
     <#
     .SYNOPSIS
@@ -145,15 +149,31 @@ function import-ValidCSV {
 }
 <# /FUNCTIONS #>
 <# -------------------------- EXECUTIONS -------------------------- #>
-Test-ExchTools()
+If (!$TestOnly){
+    Test-ExchTools
+}
 
 $requiredColumns = @"
 Name
 PublicFolderDatabase
 "@
-$MailboxDatabaseAndDefaultPFTable = import-ValidCSV $InputCSV
 
+$Columns = HereStringToArray $requiredColumns
 
+$MailboxDatabaseAndDefaultPFTable = import-ValidCSV -inputFile $InputCSV -requiredColumns $Columns
+
+Foreach ($Item in $MailboxDatabaseAndDefaultPFTable) {
+    $DatabaseFirst2Letters = $Item.Name.Substring(0,2)
+
+    
+
+    $cmd = "Set-MailboxDatabase $($Item.Name) -PublicFolderDatabase $($Item.PublicFolderDatabase)"
+    If ($TestOnly){
+        Write-host $cmd
+    } Else {
+        invoke-Expression $cmd
+    }
+}
 
 <# /EXECUTIONS #>
 <# -------------------------- CLEANUP VARIABLES -------------------------- #>
