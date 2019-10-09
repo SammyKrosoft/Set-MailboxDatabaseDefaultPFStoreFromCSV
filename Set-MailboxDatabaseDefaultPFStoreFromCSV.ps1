@@ -150,7 +150,7 @@ function import-ValidCSV {
 <# /FUNCTIONS #>
 <# -------------------------- EXECUTIONS -------------------------- #>
 If (!$TestOnly){
-    Test-ExchTools
+    #Test-ExchTools
 }
 
 $requiredColumns = @"
@@ -165,13 +165,12 @@ $MailboxDatabaseAndDefaultPFTable = import-ValidCSV -inputFile $InputCSV -requir
 Foreach ($Item in $MailboxDatabaseAndDefaultPFTable) {
     $DatabaseFirst2Letters = $Item.Name.Substring(0,2)
 
-    
-
     $cmd = "Set-MailboxDatabase $($Item.Name) -PublicFolderDatabase $($Item.PublicFolderDatabase)"
     If ($TestOnly){
         Write-host $cmd
     } Else {
-        invoke-Expression $cmd
+        Write-Host "$(Get-Date -F "dd-MM-yyyy@hh-mm-ss") # Executing $cmd ..."
+        Invoke-Expression $cmd
     }
 }
 
