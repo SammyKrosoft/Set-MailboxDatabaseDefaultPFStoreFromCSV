@@ -165,7 +165,7 @@ $MailboxDatabaseAndDefaultPFTable = import-ValidCSV -inputFile $InputCSV -requir
 Foreach ($Item in $MailboxDatabaseAndDefaultPFTable) {
     $DatabaseFirst2Letters = $Item.Name.Substring(0,2)
 
-    $cmd = "Set-MailboxDatabase $($Item.Name) -PublicFolderDatabase $($Item.PublicFolderDatabase)"
+    $cmd = "Set-MailboxDatabase $($Item.Name) -PublicFolderDatabase $($Item.PublicFolderDatabase) "
     If ($TestOnly){
         Write-host $cmd
     } Else {
