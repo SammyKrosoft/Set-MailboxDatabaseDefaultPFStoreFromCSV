@@ -141,7 +141,7 @@ function import-ValidCSV {
         {
                 if (!($inputTest | ? {$_.name -eq $requiredColumn}))
                 {
-                        write-error "$inputFile is missing the $requiredColumn column"
+                        write-host "$inputFile is missing the $requiredColumn column" -BackgroundColor red -ForegroundColor blue
                         exit 10
                 }
         }
